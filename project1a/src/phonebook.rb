@@ -11,7 +11,7 @@ class PhoneBook
     end
 
     def lookupByNum(number)
-        raise Exception, "Not implemente"
+        raise Exception, "Not implemented"
     end
 
     def namesByAc(areacode)
