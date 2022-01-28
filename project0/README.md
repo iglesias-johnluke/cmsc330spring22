@@ -3,6 +3,7 @@
 Due: February 9, 2022 at 11:59 PM
 
 This project is simply to get your system ready. Although you will "submit" this project on Gradescope, it is not counted towards your final grade.  The good-faith attempt (GFA) rule **does not apply** to this project.
+This project is simply to get your system ready.  You will "submit" this project for a grade.  The good-faith attempt (GFA) rule **does not apply** to this project.
 
 **Start with the [Instructions](#instructions)!**
 
@@ -121,9 +122,7 @@ These instructions assume you have a Debian-based system (e.g. Ubuntu).  If you 
     - We will be using OCaml version 4.12.0.  Run `ocaml -version` to check which version is currently installed
     - If you are already on 4.12.0, you can skip to #6
     - Run `opam update`
-    - If you are on another version, run `opam switch 4.12.0`
-    - If you get an error saying that switch is not currently installed, run `opam switch create 4.12.0`.  This may take a while, please be patient
-      - While installing the new switch, if you get an error for `bwrap`, first remove the `.opam` directory using `rm -r ~/.opam` and then reinitialize opam by **disabling sanboxing** using `opam init --disable-sandboxing`. Type "n" when prompted to modify `~/.profile`. Once opam has been initialized, rerun `opam switch create 4.12.0`
+    - If you are on another version, run `opam switch 4.12.0`.  If you get an error saying that switch is not currently installed, run `opam switch create 4.12.0`.  This may take a while, please be patient
     - Run `eval $(opam env)`
     - Ensure you are now on the correct version by running `ocaml -version`
 6. Install OCaml packages
@@ -208,14 +207,44 @@ passwords and try it again.
 
 ## Special macOS Instructions
 
-Verify you're running an older version of macOS. Either click the Apple button in the menubar in the top-left and click "About This Mac", or else run `sw_vers` from the terminal. You should only need the special section if your macos version is less than 10.15
+### Do you have a Mac running an older version of macOS?
+
+Verify you're running an older version of macOS. Either click the Apple button in the menubar in the top-left and click "About This Mac", or else run `sw_vers` from the terminal.
 
 Follow [the directions for macOS](#macos), but with some changes.
 
-- If you ran the special instructions previously, undo by uninstalling homebrew:
-  - `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"`
-  - You will probably have leftover files in `/opt/homebrew` or `/usr/local`. We will *try* to help you delete them in OH.
-- Run `brew install` INDIVIDUALLY on each of ocaml, opam, openssl, graphviz.
-  - so `brew install ocaml`, `brew install opam`, etc.
-- If openssl or graphviz install fails, try again with `-s`
-  - ie `brew install -s graphviz`
+- Step 3.
+  - Instead do `brew install ocaml opam`
+- Step 10. Install OpenSSL.
+  - Run `brew edit openssl`
+  - Edit the file that's opened
+    - NOTE: By default, Homebrew will put you in vim for this. If you're not familiar with vim: type `i` to switch to a regular editing mode, make the changes below, then (when you're done) hit `ESC` followed by `:wq`, then press `ENTER`.
+    - Scroll to the line `args = %W[`
+    - At the bottom of this list (which should have items like `--prefix=#{prefix}`, `--openssldir=#{openssldir}`, `no-ssl3`, etc), add a new line:
+      - `-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include`
+    - Save and close the file.
+    - You can look at [this Stack Overflow answer](https://stackoverflow.com/a/68990901/3377150) to see what it should look like.
+  - Run `brew install openssl@1.1`
+- Step 11. Install dependencies.
+  - Run `brew install readline sqlite xz python@3.9 ninja meson libffi pcre glib sphinx-doc cmake jasper netpbm gts util-macros xtrans xcb-proto libpthread-stubs xorgproto libxau libxdmcp libxcp libx11 libxext libxrender lzo pixman cairo gobject-introspection libssh2 gdk-pixbuf fribidi graphite2 icu4c harfbuzz pango libtool automake gtk-doc pkgconfig`
+- Step 12. Install librsvg from source.
+  - Create a temporary directory: `mkdir /tmp/cmsc330`
+  - Go there: `cd /tmp/cmsc330`
+  - Clone the librsvg repository: `git clone https://gitlab.gnome.org/GNOME/librsvg.git`
+  - Enter it: `cd librsvg`
+  - Run `export XML_CATALOG_FILES="/usr/local/etc/xml/catalog"`
+  - Run the configuration script: `./autogen.sh --enable-gtk-doc`
+  - Run `make`
+  - Run `make install`
+  - Leave the directory: `cd ..`
+- Step 13. Install graphviz from source.
+  - Download the archive: `curl -o graphviz.tz https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/2.49.0/graphviz-2.49.0.tar.gz`
+  - Extract the archive: `tar -xzvf graphviz.tz`
+  - Move into the created directory: `cd graphviz-2.49.0`
+  - Run the configuration script: `./configure`
+  - Run `make`
+  - Run `make install`
+- Step 14. Check it worked.
+  - Assuming no errors came up, graphviz should now be installed.
+  - Verify by doing `dot -V`
+    - This should output a version number. If it says something like "command not found", something didn't go right.
