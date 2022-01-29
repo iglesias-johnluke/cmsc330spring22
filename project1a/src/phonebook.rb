@@ -3,11 +3,14 @@ class PhoneBook
         @book = {}
     end
 
+    #book hash maps name keys to an array value, array[0] = number, array[1] = isListed
+    #book = { "john" => ["202-409-7315", true], ....}
     def add(name, number, is_listed)
         if @book.has_key?(name) == false and isValidPhoneNumber(number) and hasListingConflict(number, is_listed) == false
             @book[name] = [number, is_listed]
             return true
         end
+        # puts "NOT ADDED " + name
         return false
 
     end
@@ -57,14 +60,29 @@ class PhoneBook
     
 
     def lookup(name)
-        raise Exception, "Not implemented"
+        if @book[name] != nil and @book[name][1] == true
+            return @book[name][0]
+        end
+        return nil
     end
 
     def lookupByNum(number)
-        raise Exception, "Not implemented"
+        for key in @book.keys do
+            if @book[key][0] == number and @book[key][1] == true
+                return key
+            end
+        end
+        return nil
+
     end
 
     def namesByAc(areacode)
-        raise Exception, "Not implemented"
+        output = []
+        for key in @book.keys do
+            if areacode == @book[key][0][0..2]
+                output.push(key)
+            end
+        end
+        return output
     end
 end
