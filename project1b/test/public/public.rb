@@ -29,7 +29,7 @@ class PublicTests < MiniTest::Test
         for i, size in [1,2,3,4].zip([4,5,3,2])
             pos0 = Position.new(i, i)
             pos1 = Position.new(i + 4, i + 4)
-            @p1_ships << Ship.new(pos0, "Right", size)
+            @p1_ships << Ship.new(pos0, "Right", size) #append new ship to p_ship arrays
             @p2_ships << Ship.new(pos1, "Right", size)
             for j in 0..(size - 1)
                 @p2_perf_atk << Position.new(i, i + j)
@@ -37,6 +37,8 @@ class PublicTests < MiniTest::Test
             end
         end
     end
+
+
 
     def test_public_gameboard_1
         test_board = GameBoard.new 10, 10
@@ -49,6 +51,7 @@ class PublicTests < MiniTest::Test
             assert(add_shp_ret, "A valid ship was not added")
         end
 
+
         # Property: A ship will be hit if attacked
         for i in @p2_perf_atk
             assert(test_board.attack_pos(i), "Attack that should hit did not")
@@ -57,6 +60,8 @@ class PublicTests < MiniTest::Test
         # Property: Nothing will change for a miss
         refute(test_board.attack_pos(Position.new(2, 1)), "Attack should have missed but hit")
     end
+
+
 
     def test_public_gameboard_2
         # Property: (add a ship & attack the length of the ship) => no. of attacks on the ship == nm_successful_attacks
@@ -106,6 +111,40 @@ class PublicTests < MiniTest::Test
         assert(ret, "A boat is expected to be attacked but is not")
         assert_equal(3, p1_brd.num_successful_attacks, "The number of hits needs to be correct")
     end
+
+    def test_public_test_controller_1
+        # This test just reads a correct file 
+        # and performs some tests to check if 
+        # The file was read correctly
+
+        # Property: Correct files, does not yield errors
+        assert(read_ships_file(SHIPS_P1), "#{SHIPS_P1} Should read correctly")
+        assert(read_ships_file(SHIPS_P2), "#{SHIPS_P2} Should read correctly")
+        assert(read_attacks_file(PERF_ATK_P1), "#{PERF_ATK_P1} Should read correctly")
+        assert(read_attacks_file(PERF_ATK_P1), "#{PERF_ATK_P1} Should read correctly")
+
+        game = GameController.new(2)
+        p1_brd = game.load_ships(SHIPS_P1, 1)
+        p1_atk = game.load_attacks(PERF_ATK_P1, 1)
+        p2_brd = game.load_ships(SHIPS_P2, 2)
+        p2_atk = game.load_attacks(PERF_ATK_P2, 1)
+
+        pos0 = Position.new(2,1)
+        pos1 = Position.new(2,2)
+        pos2 = Position.new(2,3)
+        pos3 = Position.new(2,4)
+
+        # Property: A structure read from a valid file and has the ships attacked 
+        #           will register the attack and return the values according to guidelines
+        ret = p1_brd.attack_pos(pos1)
+        ret = p1_brd.attack_pos(pos2) && ret
+        ret = p1_brd.attack_pos(pos3) && ret
+
+        p1_brd.attack_pos(pos0)
+        assert(ret, "A boat is expected to be attacked but is not")
+        assert_equal(3, p1_brd.num_successful_attacks, "The number of hits needs to be correct")
+    end
+
 
     def test_public_test_controller_2
         # This is a rudimentary test to check if the 
