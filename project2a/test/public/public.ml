@@ -116,6 +116,6 @@ let suite =
     "combine" >:: test_combine;
     "merge" >:: test_merge; 
     "is_palindrome" >:: test_is_palindrome
-  ]
+  ] 
 
 let _ = run_test_tt_main suite

@@ -2,13 +2,33 @@
 (* Part 1: Non-Recursive Functions *)
 (***********************************)
 
-let rev_tup tup = failwith "unimplemented"
+let rev_tup tup = let (a, b, c) = tup in (c, b, a)
 
-let is_odd x = failwith "unimplemented"
+let is_odd x = 
+    if (x mod 2) = 0 then
+        false
+    else
+        true
 
-let area x y = failwith "unimplemented"
+let area x y = 
+    let (lengthStart, _) = x in
+    let (lengthEnd, _) = y in
+    let ( _ , heightStart) = x in
+    let ( _ , heightEnd) = y in
+    abs(lengthStart - lengthEnd) * abs(heightStart - heightEnd)
 
-let volume x y = failwith "unimplemented"
+
+let volume x y = 
+    let (lengthStart, _, _ ) = x in
+    let (lengthEnd, _, _ ) = y in
+    let ( _ , heightStart, _ ) = x in
+    let ( _ , heightEnd, _) = y in
+    let ( _ , _ , widthStart) = x in
+    let ( _ , _, widthEnd) = y in
+
+    abs(lengthStart - lengthEnd) * abs(heightStart - heightEnd) 
+        * abs(widthStart - widthEnd)
+
 
 (*******************************)
 (* Part 2: Recursive Functions *)
