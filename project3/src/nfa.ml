@@ -32,37 +32,32 @@ let explode (s: string) : char list =
 
 (*aux function returns endState if a 3-arg tuple has matching
 starting state and transition symbol, None ow *)
-let getEndState (tup : ('q * 's option * 'q)) (startState : 'q) (symbol: 's option) = 
+let getEndState (tup : ('q * 's option * 'q)) (startState : 'q) (symbol: 's option) (lis : 'q list) = 
   match tup with 
   | (otherStartState, Some otherSymbol, endState) -> 
-      if (startState = otherStartState) && (symbol = Some otherSymbol) then Some endState
-      else None
+      if (startState = otherStartState) && (symbol = Some otherSymbol) then lis@[endState]
+      else lis
   | (otherStartState, None, endState) -> 
-      if (startState = otherStartState) && (symbol = None) then Some endState
-      else None
-
+      if (startState = otherStartState) && (symbol = None) then lis@[endState]
+      else lis
 
 let rec fold f a xs = match xs with
-| [] -> a
-| x :: xt -> fold f (f a x) xt
+   [] -> a
+  | x :: xt -> fold f (f a x) xt
+
 
 
 (* if symbol is None, then check in delta where there is a None symbol and 
 matching start state. 
 Check if symbol is in alphabet, if so then check delta for
 tuple with matching start state + transition symbol, return end state in tuple *)
-let move (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: 's option) : 'q list =
-  let output = [] in 
-  let iterator = List.iter (fun currState -> (*loop thru states in qs *)
-                              (*fold over nfa.delta, appending matching
-                              ending states to output list *)
-                              fold (fun acc currTuple -> 
-                                  if (getEndState currTuple currState s) != None then 
-                                  output@[getEndState currTuple currState s]
-                                  else output
-                                  ) output nfa.delta  
-                              
-                            ) qs 
+let move (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: 's option) : 'q list = 
+  let output = [] in
+  let _ = fold (fun acc currState -> 
+                                fold (fun acc currTuple -> 
+                                        getEndState currTuple currState s output 
+                                      ) output nfa.delta
+                              ) output qs
   in output
 
   
