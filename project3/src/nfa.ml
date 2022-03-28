@@ -53,12 +53,12 @@ Check if symbol is in alphabet, if so then check delta for
 tuple with matching start state + transition symbol, return end state in tuple *)
 let move (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: 's option) : 'q list = 
   let output = [] in
-  let _ = fold (fun acc currState -> 
-                                fold (fun acc currTuple -> 
-                                        getEndState currTuple currState s output 
-                                      ) output nfa.delta
-                              ) output qs
-  in output
+  fold (fun acc currState -> 
+            fold (fun acc currTuple -> 
+                    getEndState currTuple currState s output 
+                  ) output nfa.delta
+          ) output qs
+  
 
   
 
