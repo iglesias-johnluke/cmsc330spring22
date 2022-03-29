@@ -2,10 +2,10 @@
 # OCAMLPARAM: unset
 # Workspace root:
 # /Users/johnlukeiglesias/Documents/GitHub/cmsc330spring22/project3
-$ /usr/bin/getconf _NPROCESSORS_ONLN > /var/folders/yk/5t7cp8zj2r95nxxh2thdbq0c0000gn/T/dunee08661.output 2> /dev/null
+$ /usr/bin/getconf _NPROCESSORS_ONLN > /var/folders/yk/5t7cp8zj2r95nxxh2thdbq0c0000gn/T/dune4cbd46.output 2> /dev/null
 # Auto-detected concurrency: 8
 # disable binary cache
-$ /opt/homebrew/bin/ocamlc.opt -config > /var/folders/yk/5t7cp8zj2r95nxxh2thdbq0c0000gn/T/dune587661.output
+$ /opt/homebrew/bin/ocamlc.opt -config > /var/folders/yk/5t7cp8zj2r95nxxh2thdbq0c0000gn/T/dune5591de.output
 # Dune context:
 #  { name = "default"
 #  ; kind = "default"
@@ -32,16 +32,14 @@ $ /opt/homebrew/bin/ocamlc.opt -config > /var/folders/yk/5t7cp8zj2r95nxxh2thdbq0
 #            "/Users/johnlukeiglesias/Documents/GitHub/cmsc330spring22/project3/_build/default"
 #        ; "OCAMLFIND_IGNORE_DUPS_IN" :
 #            "/Users/johnlukeiglesias/Documents/GitHub/cmsc330spring22/project3/_build/install/default/lib"
+#        ; "OCAMLPATH" :
+#            "/Users/johnlukeiglesias/Documents/GitHub/cmsc330spring22/project3/_build/install/default/lib"
 #        ; "OCAMLTOP_INCLUDE_PATH" :
 #            "/Users/johnlukeiglesias/Documents/GitHub/cmsc330spring22/project3/_build/install/default/lib/toplevel"
 #        ; "OCAML_COLOR" : "always"
 #        ; "OPAMCOLOR" : "always"
 #        }
-#  ; findlib_path =
-#      [ External
-#          "/Users/johnlukeiglesias/Documents/GitHub/cmsc330spring22/project3/dep"
-#      ; External "/Users/johnlukeiglesias/.opam/default/lib"
-#      ]
+#  ; findlib_path = [ External "/Users/johnlukeiglesias/.opam/default/lib" ]
 #  ; arch_sixtyfour = true
 #  ; natdynlink_supported = true
 #  ; supports_shared_libraries = true

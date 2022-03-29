@@ -40,11 +40,23 @@ let getEndState (tup : ('q * 's option * 'q)) (startState : 'q) (symbol: 's opti
   | (otherStartState, None, endState) -> 
       if (startState = otherStartState) && (symbol = None) then lis@[endState]
       else lis
+  
 
 let rec fold f a xs = match xs with
    [] -> a
   | x :: xt -> fold f (f a x) xt
 
+(*  returns new list with duplicates removed*)
+let getSet lis = 
+  fold (fun acc currItem -> insert currItem acc) [] lis
+
+let nfa_ex = {
+    sigma = ['a'];
+    qs = [0; 1; 2];
+    q0 = 0;
+    fs = [2];
+    delta = [(1, None, 2); (2, None, 3)]
+}
 
 
 (* if symbol is None, then check in delta where there is a None symbol and 
@@ -53,17 +65,25 @@ Check if symbol is in alphabet, if so then check delta for
 tuple with matching start state + transition symbol, return end state in tuple *)
 let move (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: 's option) : 'q list = 
   let output = [] in
-  fold (fun acc currState -> 
-            fold (fun acc currTuple -> 
-                    getEndState currTuple currState s output 
-                  ) output nfa.delta
-          ) output qs
-  
-
-  
+  let rawOutput = fold (fun acc currState -> 
+            acc @ (fold (fun acc currTuple -> 
+                      acc @ (getEndState currTuple currState s output) 
+                      ) output nfa.delta
+                  )
+        ) output qs in
+  getSet rawOutput
 
 let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
-  failwith "unimplemented"
+    let output = [] in
+    let rawOutput = fold (fun acc currState -> 
+              acc @ [currState] @ (fold (fun acc currTuple -> 
+                        acc @ (getEndState currTuple currState None output) 
+                        ) output nfa.delta
+                    )
+          ) output qs  
+    in getSet rawOutput
+
+  
 
 let accept (nfa: ('q,char) nfa_t) (s: string) : bool =
   failwith "unimplemented"
