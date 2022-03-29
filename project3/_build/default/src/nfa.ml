@@ -40,7 +40,9 @@ let getEndState (tup : ('q * 's option * 'q)) (startState : 'q) (symbol: 's opti
   | (otherStartState, None, endState) -> 
       if (startState = otherStartState) && (symbol = None) then lis@[endState]
       else lis
-  
+
+(* given a list of start states (rawOutput), returns new list with any additional
+valid epsilon transition states *)  
 
 let rec fold f a xs = match xs with
    [] -> a
@@ -50,6 +52,12 @@ let rec fold f a xs = match xs with
 let getSet lis = 
   fold (fun acc currItem -> insert currItem acc) [] lis
 
+let getAllEpsilonTransitions (nfa: ('q,'s) nfa_t) (rawOutput: 'q list) : 'q list = 
+  let output = rawOutput in
+  fold (fun acc currState -> 
+            acc @ (fold (fun a currTuple -> a @ (getEndState currTuple currState None a)) [] nfa.delta)
+        ) output rawOutput 
+
 let nfa_ex = {
     sigma = ['a'];
     qs = [0; 1; 2];
@@ -57,7 +65,6 @@ let nfa_ex = {
     fs = [2];
     delta = [(1, None, 2); (2, None, 3)]
 }
-
 
 (* if symbol is None, then check in delta where there is a None symbol and 
 matching start state. 
@@ -80,8 +87,9 @@ let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
                         acc @ (getEndState currTuple currState None output) 
                         ) output nfa.delta
                     )
-          ) output qs  
-    in getSet rawOutput
+          ) output qs in
+    let allTransitions = getAllEpsilonTransitions nfa rawOutput in
+    getSet allTransitions
 
   
 
