@@ -52,6 +52,9 @@ let rec fold f a xs = match xs with
 let getSet lis = 
   fold (fun acc currItem -> insert currItem acc) [] lis
 
+(* returns list containing all rawOutput values along with
+any other states that were reachable from epsilon transitions from the initial
+values *)
 let getAllEpsilonTransitions (nfa: ('q,'s) nfa_t) (rawOutput: 'q list) : 'q list = 
   let output = rawOutput in
   fold (fun acc currState -> 
@@ -91,10 +94,27 @@ let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
     let allTransitions = getAllEpsilonTransitions nfa rawOutput in
     getSet allTransitions
 
-  
+(* returns first element in list or None if list is empty *)
+let getFirst lis = match lis with 
+  | [] -> None
+  | a::b -> Some a
 
-let accept (nfa: ('q,char) nfa_t) (s: string) : bool =
-  failwith "unimplemented"
+let removeFirst lis = match lis with
+  | [] -> []
+  | [a] -> []
+  | a::b -> b
+
+let accept (nfa: ('q,char) nfa_t) (s: string) : bool = 
+  let stringList = explode s in
+  let rec acceptAux nfa strList currState =
+    if strList = [] then (elem currState nfa.fs) (*base case, when at end of strList* *)
+    else 
+      let nextStateList =  insert_all (move nfa [currState] (getFirst strList)) (e_closure nfa [currState]) in
+      fold (fun acc currState -> (*loop thru each possible next state *)
+                if (acceptAux nfa (removeFirst strList) currState) && (acc = false) then true (*target found *)
+                else acc
+            ) false nextStateList
+  in acceptAux nfa stringList nfa.q0
 
 (*******************************)
 (* Part 2: Subset Construction *)
