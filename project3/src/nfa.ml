@@ -52,23 +52,22 @@ let rec fold f a xs = match xs with
 let getSet lis = 
   fold (fun acc currItem -> insert currItem acc) [] lis
 
-(* returns list containing all rawOutput values along with
-any other states that were reachable from epsilon transitions from the initial
-values *)
-let getAllEpsilonTransitions (nfa: ('q,'s) nfa_t) (rawOutput: 'q list) : 'q list = 
-  let output = rawOutput in
-  fold (fun acc currState -> (*loop over states in rawOutput list *)
-            (*loop over nfa's transition tuples, add to output any matches
-            where state transitions to another state thru e-closure *)
-            acc @ (fold (fun a currTuple -> a @ (getEndState currTuple currState None a)) [] nfa.delta)
-        ) output rawOutput 
+(* returns first element in list or None if list is empty *)
+let getFirst lis = List.hd(lis)
+
+let removeFirst lis = match lis with
+  | [] -> []
+  | [a] -> []
+  | a::b -> b
+
+
 
 let nfa_ex = {
     sigma = ['a'];
     qs = [0; 1; 2];
     q0 = 0;
     fs = [2];
-    delta = [(1, None, 2); (2, None, 3)]
+    delta = [(1, None, 2); (0, None, 1 )]
 }
 
 (* if symbol is None, then check in delta where there is a None symbol and 
@@ -85,29 +84,28 @@ let move (nfa: ('q,'s) nfa_t) (qs: 'q list) (s: 's option) : 'q list =
         ) output qs in
   getSet rawOutput
 
-let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list =
-    let output = [] in
-    let rawOutput = fold (fun acc currState -> (*loop over start states *)
-              (* loop over nfa tuples, appending matches to output*)
-              acc @ [currState] @ (fold (fun acc currTuple -> 
-                        acc @ (getEndState currTuple currState None output) 
-                        ) output nfa.delta
-                    )
-          ) output qs in
-    (*allTransitions adds any states to output that are reachable from MULTIPLE 
-    epsilon transitions *)
-    let allTransitions = getAllEpsilonTransitions nfa rawOutput in
-    getSet allTransitions (*remove duplicates *)
+(* returns list containing all rawOutput values along with
+any other states that were reachable from epsilon transitions from the initial
+values *)
+let rec getAllEpsilonTransitions (nfa: ('q,'s) nfa_t) (rawOutputLeft: 'q list) 
+                                    (output : 'q list) : 'q list = 
+  if rawOutputLeft = [] then output
+  else  
+    let currState =  (getFirst rawOutputLeft) in
+    (*newStates is states list reachable from currState thatre NOT in output already *)
+    let newStates = fold (fun acc currTuple -> 
+                            (* let nextStates = (getEndState currTuple currState None []) in *)
+                            let nextStates = insert currState (move nfa [currState] None) in
+                            let newStates = diff nextStates (output) in
+                            acc@newStates
+                      ) [] nfa.delta in
+    let rawOutputLeft = diff (union rawOutputLeft newStates) [currState] in 
+    let output = union output newStates in (*output now has new states and rawOutputLeft has newStates w/o currState *)
+    getAllEpsilonTransitions nfa rawOutputLeft output
 
-(* returns first element in list or None if list is empty *)
-let getFirst lis = match lis with 
-  | [] -> None
-  | a::b -> Some a
 
-let removeFirst lis = match lis with
-  | [] -> []
-  | [a] -> []
-  | a::b -> b
+let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list = getAllEpsilonTransitions nfa qs qs
+   
 
 (* returns false if state and transition symbol can move to a DIFFERENT STATE
  within the NFA, true ow. However if state is an ENDINGSTATE in nfa, returns false*)
