@@ -106,7 +106,6 @@ let rec getAllEpsilonTransitions (nfa: ('q,'s) nfa_t) (rawOutputLeft: 'q list)
 
 let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list = getAllEpsilonTransitions nfa qs qs
    
-
 (* returns false if state and transition symbol can move to a DIFFERENT STATE
  within the NFA, true ow. However if state is an ENDINGSTATE in nfa, returns false*)
  let isStateStuck (nfa: ('q,char) nfa_t) (strList : char list) state = 
@@ -140,7 +139,18 @@ let accept (nfa: ('q, char) nfa_t) (s: string) : bool =
 (*******************************)
 
 let new_states (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
-  failwith "unimplemented"
+  if qs = [] then (List.map (fun letter -> []) nfa.sigma)
+  else
+    fold (fun acc letter -> 
+                  (*if currLetter transition leads to deadstate, add [] *)
+                      if (move nfa qs (Some letter)) = [] then acc@[[]]
+                      else 
+                        let nextEpsilonStates = (e_closure nfa qs) in
+                        let nextStateList = e_closure nfa (move nfa nextEpsilonStates (Some letter) ) in
+                        acc@[nextStateList]
+        ) [] nfa.sigma
+
+
 
 let new_trans (nfa: ('q,'s) nfa_t) (qs: 'q list) : ('q list, 's) transition list =
   failwith "unimplemented"
