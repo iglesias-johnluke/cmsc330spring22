@@ -49,13 +49,13 @@ let rec fold f a xs = match xs with
   | x :: xt -> fold f (f a x) xt
 
 (*  returns new list with duplicates removed*)
-let getSet lis = 
+let getSet (lis : 'q list) = 
   fold (fun acc currItem -> insert currItem acc) [] lis
 
 (* returns first element in list or None if list is empty *)
-let getFirst lis = List.hd(lis)
+let getFirst (lis : 'q list)  = List.hd(lis)
 
-let removeFirst lis = match lis with
+let removeFirst (lis : 'q list) = match lis with
   | [] -> []
   | [a] -> []
   | a::b -> b
@@ -109,22 +109,26 @@ let e_closure (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list = getAllEpsilonTransi
 
 (* returns false if state and transition symbol can move to a DIFFERENT STATE
  within the NFA, true ow. However if state is an ENDINGSTATE in nfa, returns false*)
- let isStateStuck (nfa: ('q,char) nfa_t) strList state = 
+ let isStateStuck (nfa: ('q,char) nfa_t) (strList : char list) state = 
   if (elem state nfa.fs) then false (*state is valid ending state *)
   else 
-    let nextStateList =  insert_all (move nfa [state] (getFirst strList)) (e_closure nfa [state]) in 
+    let nextStateList =  insert_all (move nfa [state] (Some (getFirst strList)) ) (e_closure nfa [state]) in 
     nextStateList = [state] (*return whether this state can move to a DIFFERENT STATE *)
 
 
-let accept (nfa: ('q,char) nfa_t) (s: string) : bool = 
+let accept (nfa: ('q, char) nfa_t) (s: string) : bool = 
   let stringList = explode s in
-  let rec acceptAux nfa strList state =
-    if strList = [] then (elem state nfa.fs) (*base case, when at end of strList* *)
+  let rec acceptAux nfa (strList : char list) state =
+    (*base case, when at end of strList, check if e-closure passes* *)
+    if strList = [] then 
+      let endingStates = intersection (nfa.fs) (e_closure nfa [state]) in
+      List.length(endingStates) > 0
     else if (isStateStuck nfa strList state) then false (*if state != endstate and cannot move to DIFFERENT state, deny *)
     else 
     (*nextStateList is list of next possible states reachable from currState 
     and first letter of strList as the transition, list excludes currState *)
-      let nextStateList = remove state (insert_all (move nfa [state] (getFirst strList)) (e_closure nfa [state]) ) in
+      let nextEpsilonStates = (e_closure nfa [state]) in
+      let nextStateList = remove state ( move nfa nextEpsilonStates (Some (getFirst strList)) ) in
       fold (fun acc currState -> (*loop thru each possible next state *)
                 if (acceptAux nfa (removeFirst strList) currState) = true && (acc = false) then true (*target found *)
                 else acc
