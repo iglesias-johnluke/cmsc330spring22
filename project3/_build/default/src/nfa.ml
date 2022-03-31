@@ -146,7 +146,6 @@ let new_states (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
                       if (move nfa qs (Some letter)) = [] then acc@[[]]
                       else 
                         let nextEpsilonStates = (e_closure nfa qs) in
-                        (* let nextStateList = remove qs (move nfa nextEpsilonStates (Some letter) ) in *)
                         let nextStateList = e_closure nfa (move nfa nextEpsilonStates (Some letter) ) in
                         acc@[nextStateList]
         ) [] nfa.sigma
@@ -154,10 +153,14 @@ let new_states (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
 
 
 let new_trans (nfa: ('q,'s) nfa_t) (qs: 'q list) : ('q list, 's) transition list =
-  failwith "unimplemented"
+  List.map (fun letter -> 
+                    let nextStateList = e_closure nfa (move nfa qs (Some letter) ) in
+                    (qs, Some letter, nextStateList) 
+            ) nfa.sigma
 
 let new_finals (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
-  failwith "unimplemented"
+  if (List.length (intersection qs nfa.fs) ) > 0 then [qs]
+  else []
 
 let rec nfa_to_dfa_step (nfa: ('q,'s) nfa_t) (dfa: ('q list, 's) nfa_t)
     (work: 'q list list) : ('q list, 's) nfa_t =
