@@ -168,27 +168,40 @@ let rec nfa_to_dfa_step (nfa: ('q,'s) nfa_t) (dfa: ('q list, 's) nfa_t)
   if work = [] then dfa (*base case *)
   else 
     let r = getFirst work in
-    let unmarkedR = removeFirst work in (*mark r in R *)
     (*eList is list of tuples, each tuple is (e, letter) *)
     let eList = List.map (fun letter ->
                                  let e = e_closure nfa (move nfa r (Some letter)) in
                                  (e, letter)
                           ) dfa.sigma in
+    (*unmarkedR is list of states in R we havent market yet,
+    here we're adding any new states from the
+    current e_closure *)
+    let unmarkedR = fold (fun acc currTuple ->
+                            match currTuple with (e, letter) -> 
+                                if e = [] then acc (*handle empty e in tuple *)
+                                (*dont add e to unmarkedR if it is already a state in dfa *)
+                                else if List.length (intersection [e] dfa.qs) > 0 then acc 
+                                else acc@[e] (*ow e is a new state, add to unmarkedR *)
+                          ) work eList in
     (* allR (R) is (R U {e}) by looping over eList tuples, doing R U e *)
     let allR = fold (fun acc currTuple ->
-                                match currTuple with (e, letter) -> (union dfa.qs [e])
+                                match currTuple with (e, letter) -> 
+                                  if e = [] then acc (*dont add [] to R *)
+                                  else (union acc [e])
                    ) dfa.qs eList in
     (*update new delta of dfa to be (delta U (r, letter, e)) by looping over eList *)
     let delta = fold (fun acc currTuple ->
-                                match currTuple with (e, letter) -> (union dfa.delta [(r, Some letter, e)])
+                                match currTuple with (e, letter) -> 
+                                  if e = [] then acc
+                                  else (union acc [(r, Some letter, e)])
                       ) dfa.delta eList in
     let dfa = { 
-      qs= union dfa.qs allR (*update dfa *)
+      qs= allR (*update dfa *)
       ; sigma= dfa.sigma
       ; delta= union dfa.delta delta
       ; q0= dfa.q0
       ; fs= dfa.fs } in
-    nfa_to_dfa_step nfa dfa unmarkedR (*recursive call with updated R/work and dfa*)
+    nfa_to_dfa_step nfa dfa (removeFirst unmarkedR) (*recursive call with updated R/work and dfa*)
     
 
 let nfa_to_dfa (nfa: ('q,'s) nfa_t) : ('q list, 's) nfa_t = 
