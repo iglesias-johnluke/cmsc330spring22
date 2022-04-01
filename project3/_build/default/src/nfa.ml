@@ -164,8 +164,14 @@ let new_finals (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
 
 let rec nfa_to_dfa_step (nfa: ('q,'s) nfa_t) (dfa: ('q list, 's) nfa_t)
     (work: 'q list list) : ('q list, 's) nfa_t = 
-  
-  if work = [] then dfa (*base case *)
+  (*base case *)
+  if work = [] then 
+      let getFinalStates = fold (fun acc state -> 
+                                    if List.length (intersection state nfa.fs) > 0 then acc@[state]
+                                    else acc
+                                ) [] dfa.qs in
+      { qs= dfa.qs; sigma= dfa.sigma; 
+        delta= dfa.delta; q0= dfa.q0; fs= getFinalStates }
   else 
     let r = getFirst work in
     (*eList is list of tuples, each tuple is (e, letter) *)
