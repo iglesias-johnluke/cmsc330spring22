@@ -163,8 +163,45 @@ let new_finals (nfa: ('q,'s) nfa_t) (qs: 'q list) : 'q list list =
   else []
 
 let rec nfa_to_dfa_step (nfa: ('q,'s) nfa_t) (dfa: ('q list, 's) nfa_t)
-    (work: 'q list list) : ('q list, 's) nfa_t =
-  failwith "unimplemented"
+    (work: 'q list list) : ('q list, 's) nfa_t = 
+  
+  if work = [] then dfa (*base case *)
+  else 
+    let r = getFirst work in
+    let unmarkedR = removeFirst work in (*mark r in R *)
+    (*eList is list of tuples, each tuple is (e, letter) *)
+    let eList = List.map (fun letter ->
+                                 let e = e_closure nfa (move nfa r (Some letter)) in
+                                 (e, letter)
+                          ) dfa.sigma in
+    (* allR (R) is (R U {e}) by looping over eList tuples, doing R U e *)
+    let allR = fold (fun acc currTuple ->
+                                match currTuple with (e, letter) -> (union dfa.qs [e])
+                   ) dfa.qs eList in
+    (*update new delta of dfa to be (delta U (r, letter, e)) by looping over eList *)
+    let delta = fold (fun acc currTuple ->
+                                match currTuple with (e, letter) -> (union dfa.delta [(r, Some letter, e)])
+                      ) dfa.delta eList in
+    let dfa = { 
+      qs= union dfa.qs allR (*update dfa *)
+      ; sigma= dfa.sigma
+      ; delta= union dfa.delta delta
+      ; q0= dfa.q0
+      ; fs= dfa.fs } in
+    nfa_to_dfa_step nfa dfa unmarkedR (*recursive call with updated R/work and dfa*)
+    
 
-let nfa_to_dfa (nfa: ('q,'s) nfa_t) : ('q list, 's) nfa_t =
-  failwith "unimplemented"
+let nfa_to_dfa (nfa: ('q,'s) nfa_t) : ('q list, 's) nfa_t = 
+  (* {sigma = ['a'; 'b'; 'c'];
+    qs = [[0; 1; 2]];
+    q0 = [0];
+    fs = [[2]];
+    delta = [([0], Some 'a', [1]); ([1], Some 'b', [0]); ([1], Some 'c', [2])]
+} *)
+  let dfa = { 
+    qs= [e_closure nfa [nfa.q0]]
+    ; sigma= nfa.sigma
+    ; delta= []
+    ; q0= e_closure nfa [nfa.q0]
+    ; fs= [] } in
+  (nfa_to_dfa_step nfa dfa [e_closure nfa [nfa.q0]])
