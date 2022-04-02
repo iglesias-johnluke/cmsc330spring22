@@ -55,13 +55,21 @@ let rec convert (regexp: regexp_t) =
         fs= [s1] 
         }    
     | Concat (regex1, regex2) -> 
-        let s0 = fresh () in 
-        {qs= []; sigma= []; 
-        delta= []; q0= s0; fs= [] } 
+        let nfaA = (convert regex1) in 
+        let nfaB = (convert regex2) in 
+        {qs= union nfaA.qs nfaB.qs ; 
+        sigma= union nfaA.sigma nfaB.sigma ; 
+        delta= union (union nfaA.delta nfaB.delta) [((getFirst nfaA.fs), None, nfaB.q0)]; 
+        q0= nfaA.q0; 
+        fs= nfaB.fs } 
     | Star (regex1) -> 
         let s0 = fresh () in 
-        {qs= []; sigma= []; 
-        delta= []; q0= s0; fs= [] }    
+        let s1 = fresh () in
+        let nfaA = (convert regex1) in 
+        {qs= union (union nfaA.qs [s0]) [s1] ; 
+        sigma= nfaA.sigma; 
+        delta= union nfaA.delta [(s0, None, (getFirst nfaA.qs)); (s0, None, s1); (s1, None, s0)]; 
+        q0= s0; fs= [s1] }    
 
 
 
