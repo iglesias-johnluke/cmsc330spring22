@@ -1,5 +1,6 @@
 open List
 open Nfa
+open Sets
 
 (*********)
 (* Types *)
@@ -26,8 +27,46 @@ let fresh =
 (* Part 3: Regular Expressions *)
 (*******************************)
 
-let regexp_to_nfa (regexp: regexp_t) : (int, char) nfa_t =
-  failwith "unimplemented"
+let getFirst (lis : 'q list)  = List.hd(lis)
+
+
+(*convert a regex item to nfa *)
+let rec convert (regexp: regexp_t) = 
+  match regexp with
+    | Char (char) -> 
+        let s0 = fresh () in 
+        let s1 = fresh () in
+        {qs= [s0; s1]; sigma= [char]; 
+        delta= [ (s0, Some char, s1) ]; q0= s0; fs= [s1] }    
+    | Empty_String -> 
+        let s0 = fresh () in 
+        {qs= []; sigma= []; 
+        delta= []; q0= s0; fs= [] }    
+    | Union (regex1, regex2) -> 
+        let s0 = fresh () in 
+        let s1 = fresh () in
+        let nfaA = (convert regex1) in 
+        let nfaB = (convert regex2) in 
+        {
+        qs=(union (union nfaA.qs nfaB.qs ) [s0; s1]); 
+        sigma= (union (nfaA.sigma) (nfaB.sigma)); 
+        delta= union (union nfaA.delta nfaB.delta) [(s0, None, nfaA.q0); (s0, None, nfaB.q0); ((getFirst nfaA.fs), None, s1); ((getFirst nfaB.fs), None, s1) ]; 
+        q0= s0; 
+        fs= [s1] 
+        }    
+    | Concat (regex1, regex2) -> 
+        let s0 = fresh () in 
+        {qs= []; sigma= []; 
+        delta= []; q0= s0; fs= [] } 
+    | Star (regex1) -> 
+        let s0 = fresh () in 
+        {qs= []; sigma= []; 
+        delta= []; q0= s0; fs= [] }    
+
+
+
+let regexp_to_nfa (regexp: regexp_t) : (int, char) nfa_t = 
+  convert regexp
 
 (*****************************************************************)
 (* Below this point is parser code that YOU DO NOT NEED TO TOUCH *)

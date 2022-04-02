@@ -166,10 +166,11 @@ let rec nfa_to_dfa_step (nfa: ('q,'s) nfa_t) (dfa: ('q list, 's) nfa_t)
     (work: 'q list list) : ('q list, 's) nfa_t = 
   (*base case *)
   if work = [] then 
-      let getFinalStates = fold (fun acc state -> 
-                                    if List.length (intersection state nfa.fs) > 0 then acc@[state]
-                                    else acc
-                                ) [] dfa.qs in
+      let getFinalStates = 
+          fold (fun acc state -> 
+                  if List.length (intersection state nfa.fs) > 0 then acc@[state]
+                  else acc
+              ) [] dfa.qs in
       { qs= dfa.qs; sigma= dfa.sigma; 
         delta= dfa.delta; q0= dfa.q0; fs= getFinalStates }
   else 
