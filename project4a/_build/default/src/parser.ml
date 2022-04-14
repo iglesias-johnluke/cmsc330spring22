@@ -47,23 +47,20 @@ let rec parse_expr toks =
     match (lookahead toks) with
     | Some Tok_Let -> parseLet toks
     | Some Tok_If -> parseIf toks
-    | Some token -> parsePrimary toks (*parse primary/terminals *)
-    | _ ->  (raise (InvalidInputException("InvalidInputException")))
-
-    (* | Tok_Fun -> parseFun toks
-    | Tok_Or -> parseOr toks *)
+    | Some Tok_Fun -> parseFunctionExpr toks
+    (*parse Or *)
+    | _ ->  parseOr toks
 
   (* Tok_Int | Tok_Bool | Tok_String | Tok_ID | ( Expr ) *)
   and parsePrimary toks = 
     match lookahead toks with 
-      | Some (Tok_Int i) -> let t = match_token toks ( (Tok_Int i)) in
-                      (t, Value(Int(i)))
+      | Some (Tok_Int i) -> let t = match_token toks ( (Tok_Int i)) in (t, Value(Int(i)))
       | Some (Tok_Bool b) -> let t = match_token toks ( (Tok_Bool b)) in
                       (t, Value(Bool(b)))
       | Some (Tok_String s) -> let t = match_token toks ( (Tok_String s)) in
                       (t, Value(String(s)))
       | Some (Tok_ID s) -> let t = match_token toks ( (Tok_ID s)) in
-                      (t, Value(String s))
+                      (t,  ID s)
       | Some Tok_LParen -> let t = match_token toks Tok_LParen in
                           let (t', exp) = (parseExpr t) in
                       (t', exp)
@@ -119,14 +116,128 @@ let rec parse_expr toks =
 
         (t''''', If(exp', exp''', exp''''' ))
     | _ ->  (raise (InvalidInputException("InvalidInputException")))
-  (* and parseEquality toks = 
-    let (t, exp1) = parseExpr toks in 
-    match (lookahead t) with
+  
+  and parseFunctionExpr toks = 
+    match (lookahead toks) with 
+    | Some Tok_Fun -> let t = match_token toks Tok_Fun in
+                let idString = 
+                  match (lookahead t) with 
+                  | Some (Tok_ID s) -> s
+                  | _ -> (raise (InvalidInputException("InvalidInputException"))) in
+                let t'' = match_token t (Tok_ID idString) in
+                let t''' = match_token t'' Tok_Arrow in
+                let (t'''', expr) = parseExpr t''' in
+                (t'''', Fun( idString, expr) )
+    | _ -> (raise (InvalidInputException("InvalidInputException")))
+
+  
+  and parseFunctionCall toks =
+    let (t, exp) = parsePrimary toks in
+      match (lookahead t) with 
+      (*if theres a subsequent primaryExpr, parsePrimary it, then return FunctionCall *)
+      | Some (Tok_Int i) -> let (t', exp') = parsePrimary t in (t', FunctionCall(exp, exp'))
+      | Some (Tok_Bool b) -> let (t', exp') = parsePrimary t in (t', FunctionCall(exp, exp'))
+      | Some (Tok_String s) -> let (t', exp') = parsePrimary t in (t', FunctionCall(exp, exp'))
+      | Some (Tok_ID s) -> let (t', exp') = parsePrimary t in (t', FunctionCall(exp, exp'))
+      | Some Tok_LParen -> let (t', exp') = parsePrimary t in (t', FunctionCall(exp, exp'))
+      | _ -> (t, exp) (*if theres only 1 primaryExpr, return primary exp *)
+  
+  and parseUnary toks = 
+    match (lookahead toks) with 
+    | Some Tok_Not -> (* not UnaryExpr *)
+          let t = match_token toks Tok_Not in 
+          let (t', expr) = (parseUnary t) in
+          (t', Not(expr))
+    (* FunctionCallExpr *)
+    | Some (Tok_Int i) -> parseFunctionCall toks
+    | Some (Tok_Bool b) -> parseFunctionCall toks
+    | Some (Tok_String s) -> parseFunctionCall toks
+    | Some (Tok_ID s) -> parseFunctionCall toks
+    | Some Tok_LParen -> parseFunctionCall toks
+    | _ -> (raise (InvalidInputException("InvalidInputException")))
+  
+  and parseConcat toks = 
+    let (t, exp) = parseUnary toks in
+    match (lookahead t) with 
+    | Some Tok_Concat -> 
+      let t' = match_token t Tok_Concat in
+      let (t'', exp'') = parseConcat t' in
+      (t'', Binop(Concat, exp, exp'') )
+    | _ -> (t, exp)
+  and parseMult toks = 
+    let (t, exp) = parseConcat toks in
+    match (lookahead t) with 
+    | Some Tok_Mult -> 
+        let t' = match_token t Tok_Mult in
+        let (t'', exp'') = parseMult t' in
+        (t'', Binop(Mult, exp, exp'' ))
+    | Some Tok_Div -> 
+        let t' = match_token t Tok_Div in
+        let (t'', exp'') = parseMult t' in
+        (t'', Binop(Div, exp, exp'' ))
+    | _ -> (t, exp)
+  and parseAdditive toks = 
+    let (t, exp) = parseMult toks in
+    match (lookahead t) with 
+    | Some Tok_Add -> 
+      let t' = match_token t Tok_Add in
+      let (t'', exp'') = parseAdditive t' in
+      (t'', Binop(Add, exp, exp''))
+    | Some Tok_Sub -> 
+      let t' = match_token t Tok_Sub in
+      let (t'', exp'') = parseAdditive t' in
+      (t'', Binop(Sub, exp, exp''))
+    | _ -> (t, exp)
+  and parseRelational toks =
+    let (t, exp) = parseAdditive toks in
+    match (lookahead t) with 
+    | Some Tok_Greater -> 
+      let t' = match_token t Tok_Greater in
+      let (t'', exp'') = parseRelational t' in
+      (t'', Binop(Greater, exp, exp''))
+    | Some Tok_Less -> 
+      let t' = match_token t Tok_Less in
+      let (t'', exp'') = parseRelational t' in
+      (t'', Binop(Less, exp, exp''))
+    | Some Tok_GreaterEqual -> 
+      let t' = match_token t Tok_GreaterEqual in
+      let (t'', exp'') = parseRelational t' in
+      (t'', Binop(GreaterEqual, exp, exp''))
+    | Some Tok_LessEqual -> 
+      let t' = match_token t Tok_LessEqual in
+      let (t'', exp'') = parseRelational t' in
+      (t'', Binop(LessEqual, exp, exp''))
+    | _ -> (t, exp)
+  and parseEquality toks = 
+    let (t, exp) = parseRelational toks in
+    match (lookahead t) with 
     | Some Tok_Equal -> 
-    | _ ->  *)
+      let t' = match_token t Tok_Equal in
+      let (t'', exp'') = parseEquality t' in
+      (t'', Binop(Equal, exp, exp''))
+    | Some Tok_NotEqual -> 
+      let t' = match_token t Tok_NotEqual in
+      let (t'', exp'') = parseEquality t' in
+      (t'', Binop(NotEqual, exp, exp''))
+    | _ -> (t, exp)
+  
+  and parseAnd toks = 
+    let (t, exp) = parseEquality toks in
+    match (lookahead t) with 
+    | Some Tok_And -> 
+      let t' = match_token t Tok_And in
+      let (t'', exp'') = parseAnd t' in
+      (t'', Binop(And, exp, exp''))
+    | _ -> (t, exp)
 
-
-
+  and parseOr toks = 
+    let (t, exp) = parseAnd toks in
+    match (lookahead t) with 
+    | Some Tok_Or -> 
+      let t' = match_token t Tok_Or in
+      let (t'', exp'') = parseOr t' in
+      (t'', Binop(Or, exp, exp''))
+    | _ -> (t, exp)
 (* Part 3: Parsing mutop *)
 
 let rec parse_mutop toks = failwith "unimplemented"
