@@ -38,8 +38,8 @@ let rec lookahead_many (toks: token list) (n: int) =
 (* let rec parse_expr toks = ([], Value(Int 2)) *)
 let rec parse_expr toks = 
   let (t, exp) = parseExpr toks in
-  if t <> [] then (*if there's still unprocessed tokens, fail *)
-    (raise (InvalidInputException("InvalidInputException")))
+  if t <> [] then (*if there's still unprocessed tokens, try to keep parsing *)
+    parseExpr t
   else (*if all tokens processed, return AST expression *)
     ([], exp)
   (*parses all non-terminals and terminals*)
@@ -73,22 +73,41 @@ let rec parse_expr toks =
   and parseLet toks = 
     match lookahead toks with
       | Some Tok_Let -> 
-        let t = match_token toks (Tok_Let) in
-        let idString = match lookahead t with 
-            | Some (Tok_ID str ) -> str
-            |  _ -> (raise (InvalidInputException("InvalidInputException"))) in
-        let t' = match_token t (Tok_ID(idString)) in
-        let t'' = match_token t' Tok_Equal in
-        let boolItem = match lookahead t'' with
-            | Some (Tok_Bool b) -> b 
-            | _ -> (raise (InvalidInputException("InvalidInputException"))) in
-        let t''' = match_token t'' (Tok_Bool boolItem) in
-        let (t'''', exp) = parseExpr t''' in 
-        let (t''''', exp') = parseExpr t'''' in 
+        (
+          let t = match_token toks (Tok_Let) in 
+          match (lookahead t) with 
+          | Some Tok_Rec -> (* rec case *)
+            let t' = match_token t Tok_Rec in 
+            let idString =
+              match (lookahead t') with
+              | Some (Tok_ID str) -> str
+              | _ -> (raise (InvalidInputException("InvalidInputException"))) in
+            let t'' = match_token t' (Tok_ID idString) in
+            let t''' = match_token t'' Tok_Equal in
+            let (t'''', exp1) = parseExpr t''' in
+            let t''''' = match_token (t'''') Tok_In in
+            let (t'''''', exp') = parseExpr t''''' in
+            let exp2str = match exp' with 
+                          | Value(String s) -> s
+                          | _ -> (raise (InvalidInputException("InvalidInputException"))) in
+            (t'''''', Let( idString, true, exp1, ID((exp2str)) ))
 
-        (t''''', Let( idString, boolItem, exp, exp' ))
+          | Some (Tok_ID idString) -> (*no rec case *)
+           let t' = match_token t (Tok_ID idString) in
+            let t'' = match_token t' Tok_Equal in
+            let (t''', exp1) = parseExpr t'' in
+            let t'''' = match_token (t''') Tok_In in
+            let (t''''', exp') = parseExpr t'''' in  
+            let exp2str = match exp' with 
+                          | Value(String s) -> s
+                          | _ -> (raise (InvalidInputException("InvalidInputException"))) in 
 
+            (t''''', Let( idString, false, exp1, ID((exp2str)) ))
+            
+          | _ -> (raise (InvalidInputException("InvalidInputException")))
+        )
       | _ -> (raise (InvalidInputException("InvalidInputException")))
+
   and parseIf toks =
     match (lookahead toks) with 
     | Some Tok_If -> let t = match_token toks Tok_If in
@@ -100,7 +119,11 @@ let rec parse_expr toks =
 
         (t''''', If(exp', exp''', exp''''' ))
     | _ ->  (raise (InvalidInputException("InvalidInputException")))
-
+  (* and parseEquality toks = 
+    let (t, exp1) = parseExpr toks in 
+    match (lookahead t) with
+    | Some Tok_Equal -> 
+    | _ ->  *)
 
 
 
