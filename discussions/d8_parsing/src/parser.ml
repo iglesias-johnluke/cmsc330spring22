@@ -27,35 +27,35 @@ let lookahead toks = match toks with
 (* Parses a token list. *)
 let rec parser (toks : token list) : expr =
   let (t, exp) = parse_S toks in
-  if t <> [Tok_EOF] then
+  if t <> [Tok_EOF] then (*if there's still unprocessed tokens, fail *)
     raise (Failure "did not reach EOF")
-  else
+  else (*if all tokens processed, return AST expression *)
     exp
 
 (* Parses the S rule. *)
 and parse_S toks = 
   let (t, m) = parse_M toks in
   match lookahead t with
-  | Tok_Plus -> let t' = match_token t Tok_Plus in
+  | Tok_Plus -> let t' = match_token t Tok_Plus in (*M + S case *)
                 let (t'', s) = parse_S t' in
                 (t'', Plus (m, s))
-  | _ -> t, m
+  | _ -> t, m  (* M case *)
 
 (* Parses the M rule. *)
 and parse_M toks =
   let (t, n) = parse_N toks in
   match lookahead t with
-  | Tok_Mult -> let t' = match_token t Tok_Mult in
+  | Tok_Mult -> let t' = match_token t Tok_Mult in (* (N * M case) *)
                 let (t'', m) = parse_M t' in
                 (t'', Mult (n, m))
-  | _ -> t, n
+  | _ -> t, n (*N case *)
             
 (* Parses the N rule. *)
 and parse_N toks =
   match lookahead toks with
-  | Tok_Int i -> let t = match_token toks (Tok_Int i) in
+  | Tok_Int i -> let t = match_token toks (Tok_Int i) in (* n case *)
                  (t, Int i)
-  | Tok_LParen -> let t = match_token toks Tok_LParen in
+  | Tok_LParen -> let t = match_token toks Tok_LParen in (*S case *)
                   let (t', s) = parse_S t in
                   let t'' = match_token t' Tok_RParen in
                   (t'', s)
