@@ -241,4 +241,25 @@ let rec parse_expr toks =
     | _ -> (t, exp)
 (* Part 3: Parsing mutop *)
 
-let rec parse_mutop toks = failwith "unimplemented"
+let rec parse_mutop toks = 
+  match (lookahead toks) with 
+  | Some Tok_Def -> parseDefMutop toks
+  | Some Tok_DoubleSemi -> ([], NoOp)
+  | _ -> parseExpMutop toks
+
+and parseExpMutop toks = 
+  let (t, exp) = parseExpr toks in
+  let t' = match_token t Tok_DoubleSemi in
+  (t', Expr(exp))
+
+and parseDefMutop toks = 
+  let t = match_token toks Tok_Def in
+  let idString = 
+    match (lookahead t) with 
+    | Some (Tok_ID s) -> s
+    | _ ->  (raise (InvalidInputException("InvalidInputException"))) in
+  let t' = match_token t (Tok_ID idString) in
+  let t'' = match_token t' Tok_Equal in
+  let (t''', exp) = parseExpr t'' in
+  let t'''' = match_token t''' Tok_DoubleSemi in
+  (t'''', Def(idString, exp) )

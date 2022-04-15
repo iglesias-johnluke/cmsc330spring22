@@ -163,7 +163,7 @@ let tokenize input =
             else if currItem = "" || currItem = "\t" || currItem = "\n" 
                 then (tok (position+1) wordList) (*skip empty space *)
             else
-                (raise (InvalidInputException("InvalidInputException"))) in (*handle no match of curr item *)
+                (raise (InvalidInputException("No matching regexes"))) in (*handle no match of curr item *)
     let rawWordList = Str.split (Str.regexp " +") input in
     let splitParenthesesList = splitParentheses rawWordList in
     let wordList = handleDoubleSemiInLastItem splitParenthesesList in
