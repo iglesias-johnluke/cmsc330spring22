@@ -60,7 +60,7 @@ let rec parse_expr toks =
       | Some (Tok_String s) -> let t = match_token toks ( (Tok_String s)) in
                       (t, Value(String(s)))
       | Some (Tok_ID s) -> let t = match_token toks ( (Tok_ID s)) in
-                      (t, Value(String s))
+                      (t, ID s)
       | Some Tok_LParen -> let t = match_token toks Tok_LParen in
                           let (t', exp) = (parseExpr t) in
                       (t', exp)
@@ -96,7 +96,7 @@ let rec parse_expr toks =
             let t'''' = match_token (t''') Tok_In in
             let (t''''', exp') = parseExpr t'''' in  
             let exp2str = match exp' with 
-                          | Value(String s) -> s
+                          | (ID s) -> s
                           | _ -> (raise (InvalidInputException("InvalidInputException"))) in 
 
             (t''''', Let( idString, false, exp1, ID((exp2str)) ))
