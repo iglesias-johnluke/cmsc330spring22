@@ -24,6 +24,30 @@ let handleDoubleSemiInLastItem lis =
                 | h::t -> [h] @ (listCopyWithoutLastItem t) in
         (listCopyWithoutLastItem lis) @ [lastItemWithoutSemi] @ [";;"]
 
+(*given a list of strings, if a string item is in format "(item" or "item)",
+returns list where parentheses are their own items *)
+let rec splitParentheses lis = 
+    match lis with 
+    | [] -> []
+    | [h] -> (*if item starts with "(" and length > 1, then split further *)
+        if (h.[0] = '(' && ((String.length h) > 1)) then  
+            let lastIndex = (String.length h) - 1 in
+            "(" :: splitParentheses([String.sub h 1 (lastIndex)])
+        (*if last char in item is ) and item length > 1, then split *)
+        else if ((String.length h) > 1) && h.[(String.length h) - 1] = ')'   then
+            let length = (String.length h) - 1 in
+            (String.sub h 0 length) :: ")" :: []
+        else [h]
+    | h::t -> 
+        (*if first char is "(" *)
+        if (h.[0] = '(' && ((String.length h) > 1)) then  
+            let length = (String.length h) - 1 in
+            ["("] @ splitParentheses([String.sub h 1 length]) @ splitParentheses t
+        (*if last char in item is ) and item length > 1, then split *)
+        else if ((String.length h) > 1) && h.[(String.length h) - 1] = ')' then
+            let length = (String.length h) - 1 in
+            [(String.sub h 0 length)] @ [")"] @ (splitParentheses t)
+        else h::(splitParentheses t)
 
 let tokenize input = 
     let re_int = Str.regexp "[0-9]+" in(* single digit *) 
@@ -141,5 +165,6 @@ let tokenize input =
             else
                 (raise (InvalidInputException("InvalidInputException"))) in (*handle no match of curr item *)
     let rawWordList = Str.split (Str.regexp " +") input in
-    let wordList = handleDoubleSemiInLastItem rawWordList in
+    let splitParenthesesList = splitParentheses rawWordList in
+    let wordList = handleDoubleSemiInLastItem splitParenthesesList in
     tok 0 wordList

@@ -1,1 +1,1 @@
-src/lexer.ml: List Str TokenTypes
+src/lexer.ml: List Str String TokenTypes
