@@ -2,10 +2,10 @@
 # OCAMLPARAM: unset
 # Workspace root:
 # /Users/johnlukeiglesias/Documents/GitHub/cmsc330spring22/project4a
-$ /usr/bin/getconf _NPROCESSORS_ONLN > /var/folders/yk/5t7cp8zj2r95nxxh2thdbq0c0000gn/T/duned7e587.output 2> /dev/null
+$ /usr/bin/getconf _NPROCESSORS_ONLN > /var/folders/yk/5t7cp8zj2r95nxxh2thdbq0c0000gn/T/dune92d9fc.output 2> /dev/null
 # Auto-detected concurrency: 8
 # disable binary cache
-$ /opt/homebrew/bin/ocamlc.opt -config > /var/folders/yk/5t7cp8zj2r95nxxh2thdbq0c0000gn/T/dune64f26d.output
+$ /opt/homebrew/bin/ocamlc.opt -config > /var/folders/yk/5t7cp8zj2r95nxxh2thdbq0c0000gn/T/dunec94e2e.output
 # Dune context:
 #  { name = "default"
 #  ; kind = "default"
@@ -110,3 +110,4 @@ $ /opt/homebrew/bin/ocamlc.opt -config > /var/folders/yk/5t7cp8zj2r95nxxh2thdbq0
 #      ; windows_unicode = false
 #      }
 #  }
+$ (cd _build/default && /opt/homebrew/bin/ocamldep.opt -modules -impl src/parser.ml) > _build/default/src/.p4a.objs/parser.ml.d

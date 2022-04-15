@@ -91,17 +91,17 @@ let rec parse_expr toks =
             (t'''''', Let( idString, true, exp1, ID((exp2str)) ))
 
           | Some (Tok_ID idString) -> (*no rec case *)
-           let t' = match_token t (Tok_ID idString) in
+           (
+            let t' = match_token t (Tok_ID idString) in
             let t'' = match_token t' Tok_Equal in
             let (t''', exp1) = parseExpr t'' in
             let t'''' = match_token (t''') Tok_In in
             let (t''''', exp') = parseExpr t'''' in  
-            let exp2str = match exp' with 
-                          | (ID s) -> s
-                          | _ -> (raise (InvalidInputException("InvalidInputException"))) in 
-
-            (t''''', Let( idString, false, exp1, ID((exp2str)) ))
-            
+            match exp' with 
+            | (ID s) -> (t''''', Let( idString, false, exp1, ID(s) ) )
+            | Binop(operator, e1, e2) -> (t''''', Let( idString, false, exp1, Binop(operator, e1, e2) ))
+            | _ -> raise (InvalidInputException("InvalidInputException")) 
+           )
           | _ -> (raise (InvalidInputException("InvalidInputException")))
         )
       | _ -> (raise (InvalidInputException("InvalidInputException")))
