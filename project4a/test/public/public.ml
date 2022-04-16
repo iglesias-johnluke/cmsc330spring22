@@ -15,8 +15,12 @@ let public_mutop_pi_def _ =
   assert_equal student result ~msg:"public_mutop_pi_def"
 
 let public_mutop_simple_def_and_let _ = 
-  let result = ([], Def ("x", Let ("y", false, Binop (Add, Value (Int 123), Value (Int 456)),
-   Binop (Add, ID "y", Value (Int 1))))) in
+  let result = ([], 
+    Def ("x", 
+      Let ("y", false, 
+        Binop (Add, Value (Int 123), Value (Int 456)),
+        Binop (Add, ID "y", Value (Int 1))
+        ) )) in
   let student = "def x = let y = (123 + 456) in y + 1;;" |> tokenize |> parse_mutop in
   assert_equal student result ~msg:"public_mutop_simple_def_and_let"
 
