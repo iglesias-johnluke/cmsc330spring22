@@ -90,6 +90,7 @@ let rec parse_expr toks =
                 | Value(String s) ->  (t'''''', Let( idString, true, exp1, ID(s) ))
                 | Binop(operator, e1, e2) -> (t''''', Let( idString, true, exp1, Binop(operator, e1, e2) ))
                 | FunctionCall(e1, e2) -> (t''''', Let( idString, true, exp1, FunctionCall(e1, e2)  ) )
+                | Let(s, b, e1, e2) -> (t''''', Let(idString, true, exp1, Let(s, b, e1, e2) ))
                 | _ -> (raise (InvalidInputException("InvalidInputException"))) 
               )
 
