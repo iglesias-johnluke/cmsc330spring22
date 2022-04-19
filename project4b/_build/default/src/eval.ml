@@ -37,13 +37,167 @@ let rec eval_expr env e =
   | Value(value) -> evalValue env value
   | ID str -> lookup env str
   | Not exp -> evalNot env exp
+  | Binop(op, e1, e2) -> evalBinop env op e1 e2
   | _ -> (raise (TypeError("No match with current AST item!")))
+
+and evalBinop env op exp1 exp2 = 
+  match op with 
+  | Add -> 
+    (
+      let int1 = 
+        match (eval_expr env exp1) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp1) to be type Int in evalBinop"))) in
+      let int2 = 
+        match (eval_expr env exp2) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp2) to be type Int in evalBinop"))) in
+      Int(int1 + int2)
+    )
+  | Sub -> 
+    (
+      let int1 = 
+        match (eval_expr env exp1) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp1) to be type Int in evalBinop"))) in
+      let int2 = 
+        match (eval_expr env exp2) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp2) to be type Int in evalBinop"))) in
+      Int(int1 - int2)
+    )
+  | Mult -> 
+    (
+      let int1 = 
+        match (eval_expr env exp1) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp1) to be type Int in evalBinop"))) in
+      let int2 = 
+        match (eval_expr env exp2) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp2) to be type Int in evalBinop"))) in
+      Int(int1 * int2)
+    )
+  | Div -> 
+    (
+      let int1 = 
+        match (eval_expr env exp1) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp1) to be type Int in evalBinop"))) in
+      let int2 = 
+        match (eval_expr env exp2) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp2) to be type Int in evalBinop"))) in
+      if int2 != 0 then Int(int1 / int2) else (raise DivByZeroError)
+    )
+  | Greater -> 
+    (
+      let int1 = 
+        match (eval_expr env exp1) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp1) to be type Int in evalBinop"))) in
+      let int2 = 
+        match (eval_expr env exp2) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp2) to be type Int in evalBinop"))) in
+      Bool (int1 > int2)
+    )
+  | Less -> 
+    (
+      let int1 = 
+        match (eval_expr env exp1) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp1) to be type Int in evalBinop"))) in
+      let int2 = 
+        match (eval_expr env exp2) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp2) to be type Int in evalBinop"))) in
+      Bool (int1 < int2)
+    )
+  | GreaterEqual -> 
+    (
+      let int1 = 
+        match (eval_expr env exp1) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp1) to be type Int in evalBinop"))) in
+      let int2 = 
+        match (eval_expr env exp2) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp2) to be type Int in evalBinop"))) in
+      Bool (int1 >= int2)
+    )
+  | LessEqual -> 
+    (
+      let int1 = 
+        match (eval_expr env exp1) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp1) to be type Int in evalBinop"))) in
+      let int2 = 
+        match (eval_expr env exp2) with
+        | Int i -> i
+        | _ -> (raise (TypeError("Expected (eval_expr env exp2) to be type Int in evalBinop"))) in
+      Bool (int1 <= int2)
+    )
+  | Concat -> 
+    (
+      let str1 = 
+        match (eval_expr env exp1) with
+        | String s -> s
+        | _ -> (raise (TypeError("Expected (eval_expr env exp1) to be type String in evalBinop"))) in
+      let str2 = 
+        match (eval_expr env exp2) with
+        | String s -> s
+        | _ -> (raise (TypeError("Expected (eval_expr env exp2) to be type String in evalBinop"))) in
+      String (String.concat str1 [""; str2])
+    )
+  | Equal -> 
+    (
+      match (eval_expr env exp1) with 
+      | Int(i) -> 
+        (
+        match (eval_expr env exp2) with 
+          
+            | Int(i2) -> Bool( Int(i) = Int(i2) )
+            | _ -> (raise (TypeError("Expected 2nd arg of Binop to be type op Int Equal")))
+        )
+      | String(i) -> 
+        (
+        match (eval_expr env exp2) with 
+            | String(i2) -> Bool( String(i) = String(i2) )
+            | _ -> (raise (TypeError("Expected 2nd arg of Binop to be type String for op Equal")))
+        )
+      | Bool(i) ->  Bool( Bool(i) = (eval_expr env exp2) )
+      | _ -> (raise (TypeError("Expected type Int, String, or Bool as 2nd arg for Equal operator in Binop")))
+    )
+  | NotEqual -> 
+    (
+      match (eval_expr env exp1) with 
+      | Int(i) -> 
+        (
+        match (eval_expr env exp2) with 
+          
+            | Int(i2) -> Bool( Int(i) != Int(i2) )
+            | _ -> (raise (TypeError("Expected 2nd arg of Binop to be type op Int Equal")))
+        )
+      | String(i) -> 
+        (
+        match (eval_expr env exp2) with 
+            | String(i2) -> Bool( String(i) != String(i2) )
+            | _ -> (raise (TypeError("Expected 2nd arg of Binop to be type String for op Equal")))
+        )
+      | Bool(i) ->  Bool( Bool(i) != (eval_expr env exp2) )
+      | _ -> (raise (TypeError("Expected type Int, String, or Bool as 2nd arg for Equal operator in Binop")))
+    )
+
+
+    
+  | _ -> (raise (TypeError("Expected type op for evalBinop")))
+  
 
 and evalNot env exp = 
   match (eval_expr env exp) with
   | Bool b -> Bool (Bool.not b)
   | _ -> (raise (TypeError("Expected type bool for evalNot")))
-
 
 and evalValue env value = 
   match value with
