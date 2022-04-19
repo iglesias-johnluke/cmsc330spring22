@@ -38,7 +38,13 @@ let rec eval_expr env e =
   | ID str -> lookup env str
   | Not exp -> evalNot env exp
   | Binop(op, e1, e2) -> evalBinop env op e1 e2
+  | If(e1, e2, e3) -> evalIf env e1 e2 e3
   | _ -> (raise (TypeError("No match with current AST item!")))
+
+and evalIf env e1 e2 e3 = 
+  match (eval_expr env e1) with 
+  | Bool(b) -> if b = true then (eval_expr env e2) else (eval_expr env e3)
+  | _ -> (raise (TypeError("Expected 1st argument of If to be type Bool")))
 
 and evalBinop env op exp1 exp2 = 
   match op with 
@@ -188,10 +194,42 @@ and evalBinop env op exp1 exp2 =
       | Bool(i) ->  Bool( Bool(i) != (eval_expr env exp2) )
       | _ -> (raise (TypeError("Expected type Int, String, or Bool as 2nd arg for Equal operator in Binop")))
     )
+  | Or ->
+    (
+      let bool1 = 
+        (
+        match (eval_expr env exp1) with
+        | Bool(b) -> b
+        | _ -> (raise (TypeError("Expected bool for argument in Or operator"))) 
+        ) in
+      let bool2 =
+        (
+        match (eval_expr env exp2) with
+        | Bool(b) -> b
+        | _ -> (raise (TypeError("Expected bool for argument in Or operator"))) 
+        ) in
+      Bool( bool1 || bool2)
+    )
 
+  | And ->
+    (
+      let bool1 =
+        (
+        match (eval_expr env exp1) with
+        | Bool(b) -> b
+        | _ -> (raise (TypeError("Expected bool for argument in And operator"))) 
+        ) in
+      let bool2 = 
+        (
+        match (eval_expr env exp2) with
+        | Bool(b) -> b
+        | _ -> (raise (TypeError("Expected bool for argument in And operator"))) 
+        ) in
+      Bool( bool1 && bool2)
 
+    )
     
-  | _ -> (raise (TypeError("Expected type op for evalBinop")))
+    
   
 
 and evalNot env exp = 
