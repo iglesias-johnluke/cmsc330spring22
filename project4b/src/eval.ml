@@ -29,9 +29,28 @@ let rec update env x v =
         
 (* Part 1: Evaluating expressions *)
 
+
 (* Evaluates MicroCaml expression [e] in environment [env],
    returning a value, or throwing an exception on error *)
-let rec eval_expr env e = failwith "unimplemented"
+let rec eval_expr env e = 
+  match e with 
+  | Value(value) -> evalValue env value
+  | ID str -> lookup env str
+  | Not exp -> evalNot env exp
+  (* | Binop(op, e1, e2) -> evalBinop(env Binop(op, e1, e2)) *)
+  | _ -> (raise (TypeError("No match with current AST item!")))
+
+and evalNot env exp = 
+  match (eval_expr env exp) with
+  | Bool b -> Bool (Bool.not b)
+  | _ -> (raise (TypeError("Expected type bool for evalNot")))
+
+and evalValue env value = 
+  match value with
+  | Int(i) -> Int i
+  |  Bool(b) -> Bool(b)
+  |  String(s) -> String s
+  |  Closure(env, v, exp) -> Closure(env, v, exp)
 
 (* Part 2: Evaluating mutop directive *)
 

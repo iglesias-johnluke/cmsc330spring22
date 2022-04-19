@@ -1,4 +1,4 @@
-(* Provided definitions - DO NOT MODIFY *)
+ (* Provided definitions - DO NOT MODIFY *)
 
 type op = Add | Sub | Mult | Div | Concat | Greater | Less | GreaterEqual | LessEqual | Equal | NotEqual | Or | And
 
