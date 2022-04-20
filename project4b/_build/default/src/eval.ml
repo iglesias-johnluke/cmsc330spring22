@@ -40,14 +40,35 @@ let rec eval_expr env e =
   | Binop(op, e1, e2) -> evalBinop env op e1 e2
   | If(e1, e2, e3) -> evalIf env e1 e2 e3
   | Let(v, b, e1, e2) -> evalLet env v b e1 e2
-  | _ -> (raise (TypeError("No match with current AST item!")))
+  | Fun(v, exp1) -> evalFun env v exp1
+  (* | FunctionCall(e1, e2) -> evalFunCall env e1 e2 *)
 
+  | _ -> (raise (TypeError("Expected boolean for let expression")))
+
+(* and evalFunCall env e1 e2 = 
+  let Closure(environment, x, exp) = (*eval e1 as a closure *)
+    match (eval_expr env e1) with 
+    | Closure(environment, v, exp) -> Closure(environment, v, exp)
+    | _ -> (raise (TypeError("Expected Closure type upon (eval_expr e1) within evalFunCall"))) in
+  let v = (*eval e2 as a value v *)
+    match (eval_expr env e2) with 
+    | Int(i) -> Int(i)
+    |  Bool(b) -> Bool(b)
+    |  String(s) -> String s
+    |  Closure(env, v, exp) -> Closure(env, v, exp) in
+  (*evaluate e (the closure's body) in environment A (the closure's environment), returning the result.*)
+  let newEnv = (extend environment x v) in
+  (eval_expr newEnv exp)  *)
+
+and evalFun env v exp1 = Closure(env, v, exp1)
 and evalLet env v b e1 e2 =
   match b with 
   (*not recursive case *)
   | false -> 
     let newEnv = extend env v (eval_expr env e1) in (*extend env with x:v map *)
     eval_expr newEnv e2
+  (*recursive case *)
+  (* | true ->  *)
   | _ -> (raise (TypeError("Expected boolean for let expression")))
 
 and evalIf env e1 e2 e3 = 
