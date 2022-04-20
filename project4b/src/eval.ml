@@ -39,7 +39,18 @@ let rec eval_expr env e =
   | Not exp -> evalNot env exp
   | Binop(op, e1, e2) -> evalBinop env op e1 e2
   | If(e1, e2, e3) -> evalIf env e1 e2 e3
+  | Let(v, b, e1, e2) -> evalLet env v b e1 e2
   | _ -> (raise (TypeError("No match with current AST item!")))
+
+and evalLet env v b e1 e2 =
+  match b with 
+  (*not recursive case *)
+  | false -> 
+    let newEnv = extend env v (eval_expr env e1) in (*extend env with x:v map *)
+    eval_expr newEnv e2
+  (*recursive case *)
+  (* | true ->  *)
+  | _ -> (raise (TypeError("Expected boolean for let expression")))
 
 and evalIf env e1 e2 e3 = 
   match (eval_expr env e1) with 
@@ -239,7 +250,7 @@ and evalNot env exp =
 
 and evalValue env value = 
   match value with
-  | Int(i) -> Int i
+  |  Int(i) -> Int i
   |  Bool(b) -> Bool(b)
   |  String(s) -> String s
   |  Closure(env, v, exp) -> Closure(env, v, exp)
