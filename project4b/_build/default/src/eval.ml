@@ -70,7 +70,6 @@ and evalFunCall env e1 e2 =
       |  Bool(b) -> Bool(b)
       |  String(s) -> String s
       |  Closure(env, v, exp) -> Closure(env, v, exp) 
-      (* | _ -> (raise (TypeError("Expected Closure type upon (eval_expr e1) within evalFunCall"))) *)
    in
   (*evaluate e (the closure's body) in environment A (the closure's environment), returning the result.*)
   let newEnv = (extend environment x v) in
@@ -295,4 +294,12 @@ and evalValue env value =
 (* Evaluates MicroCaml mutop directive [m] in environment [env],
    returning a possibly updated environment paired with
    a value option; throws an exception on error *)
-let eval_mutop env m = failwith "unimplemented"
+let eval_mutop env m = 
+  match m with
+  | NoOp -> ([], None)
+  | Expr(e) -> (env, Some (eval_expr env e))
+  | Def(x, e) -> 
+      let newEnv = extend_tmp env x in
+      let v = eval_expr env e in
+      let _ = update newEnv x v in
+      (newEnv, Some v)

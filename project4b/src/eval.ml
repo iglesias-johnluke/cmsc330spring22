@@ -294,4 +294,12 @@ and evalValue env value =
 (* Evaluates MicroCaml mutop directive [m] in environment [env],
    returning a possibly updated environment paired with
    a value option; throws an exception on error *)
-let eval_mutop env m = failwith "unimplemented"
+let eval_mutop env m = 
+  match m with
+  | NoOp -> ([], None)
+  | Expr(e) -> (env, Some (eval_expr env e))
+  | Def(x, e) -> 
+      let newEnv = extend_tmp env x in
+      let v = eval_expr env e in
+      let _ = update newEnv x v in
+      (newEnv, Some v)
