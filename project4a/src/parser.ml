@@ -254,7 +254,7 @@ let rec parse_mutop toks =
   | _ -> parseExpMutop toks
 
 and parseExpMutop toks = 
-  let (t, exp) = parseExpr toks in
+  let (t, exp) = parse_expr toks in
   let t' = match_token t Tok_DoubleSemi in
   (t', Expr(exp))
 

@@ -76,15 +76,18 @@ and evalFunCall env e1 e2 =
   (eval_expr newEnv exp) 
 
 and evalFun env v exp1 = Closure(env, v, exp1)
-and evalLet env v b e1 e2 =
+and evalLet env x b e1 e2 =
   match b with 
   (*not recursive case *)
   | false -> 
-    let newEnv = extend env v (eval_expr env e1) in (*extend env with x:v map *)
+    let newEnv = extend env x (eval_expr env e1) in (*extend env with x:v map *)
     eval_expr newEnv e2
   (*recursive case *)
-  (* | true ->  *)
-  | _ -> (raise (TypeError("Expected boolean for let expression")))
+  | true -> 
+    let newEnv = extend_tmp env x in
+    let v = eval_expr newEnv e1 in
+    let _ = update newEnv x v in
+    eval_expr newEnv e2
 
 and evalIf env e1 e2 e3 = 
   match (eval_expr env e1) with 
