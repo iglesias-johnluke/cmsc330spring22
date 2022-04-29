@@ -80,213 +80,213 @@ fn public_factorize() {
     assert_eq!(vec, factorize(330));
 }
 
-#[test]
-fn public_rotate() {
-    let mut vec = Vec::new();
-    vec.push(3);
-    vec.push(3);
-    vec.push(0);
+// #[test]
+// fn public_rotate() {
+//     let mut vec = Vec::new();
+//     vec.push(3);
+//     vec.push(3);
+//     vec.push(0);
 
-    let xs = [0, 3, 3];
-    assert_eq!(vec, rotate(&xs));
+//     let xs = [0, 3, 3];
+//     assert_eq!(vec, rotate(&xs));
 
-    vec.remove(0);
-    vec.remove(0);
-    vec.remove(0);
+//     vec.remove(0);
+//     vec.remove(0);
+//     vec.remove(0);
 
-    let xs = [1];
-    vec.push(1);
-    assert_eq!(vec, rotate(&xs));
-    vec.remove(0);
+//     let xs = [1];
+//     vec.push(1);
+//     assert_eq!(vec, rotate(&xs));
+//     vec.remove(0);
 
-    let xs = [1, 1, 2, 1];
-    vec.push(1);
-    vec.push(2);
-    vec.push(1);
-    vec.push(1);
-    assert_eq!(vec, rotate(&xs));
-}
+//     let xs = [1, 1, 2, 1];
+//     vec.push(1);
+//     vec.push(2);
+//     vec.push(1);
+//     vec.push(1);
+//     assert_eq!(vec, rotate(&xs));
+// }
 
-#[test]
-fn public_substr() {
-    assert_eq!(
-        true,
-        substr(
-            &"CMSC 330 is the best CS class".to_string(),
-            &"CMSC 330".to_string()
-        )
-    );
-    assert_eq!(
-        false,
-        substr(
-            &"CMSC 330 is the best CS class".to_string(),
-            &"CMSC 351 is the best CS class".to_string()
-        )
-    );
-    assert_eq!(
-        true,
-        substr(&"I love CMSC330".to_string(), &"I love CMSC330".to_string())
-    );
-}
+// #[test]
+// fn public_substr() {
+//     assert_eq!(
+//         true,
+//         substr(
+//             &"CMSC 330 is the best CS class".to_string(),
+//             &"CMSC 330".to_string()
+//         )
+//     );
+//     assert_eq!(
+//         false,
+//         substr(
+//             &"CMSC 330 is the best CS class".to_string(),
+//             &"CMSC 351 is the best CS class".to_string()
+//         )
+//     );
+//     assert_eq!(
+//         true,
+//         substr(&"I love CMSC330".to_string(), &"I love CMSC330".to_string())
+//     );
+// }
 
-#[test]
-fn public_longseq() {
-    assert_eq!(Some("aa"), longest_sequence(&"aabbaa".to_string()));
-    assert_eq!(Some("bb"), longest_sequence(&"a abba a".to_string()));
-    assert_eq!(Some("bbbbbb"), longest_sequence(&"babaabbbaaaabbbbbbaaaa"));
-}
+// #[test]
+// fn public_longseq() {
+//     assert_eq!(Some("aa"), longest_sequence(&"aabbaa".to_string()));
+//     assert_eq!(Some("bb"), longest_sequence(&"a abba a".to_string()));
+//     assert_eq!(Some("bbbbbb"), longest_sequence(&"babaabbbaaaabbbbbbaaaa"));
+// }
 
-// Linked List
-#[test]
-fn public_new_list() {
-    let mut new_list = List::new();
-    assert_eq!(new_list.size(), 0);
-    assert_eq!(new_list.pop(), None);
-}
+// // Linked List
+// #[test]
+// fn public_new_list() {
+//     let mut new_list = List::new();
+//     assert_eq!(new_list.size(), 0);
+//     assert_eq!(new_list.pop(), None);
+// }
 
-#[test]
-fn public_list_push() {
-    let helm = Armor {
-        component: Component::Helmet(true),
-        version: 0,
-    };
-    let mut new_list = List::new();
-    new_list.push(helm);
-    assert_eq!(new_list.pop(), Some(helm));
-}
+// #[test]
+// fn public_list_push() {
+//     let helm = Armor {
+//         component: Component::Helmet(true),
+//         version: 0,
+//     };
+//     let mut new_list = List::new();
+//     new_list.push(helm);
+//     assert_eq!(new_list.pop(), Some(helm));
+// }
 
-#[test]
-fn public_read_and_write_parallel() {
-    use std::thread;
+// #[test]
+// fn public_read_and_write_parallel() {
+//     use std::thread;
 
-    let mut l = List::new();
-    let wifi = Armor {
-        component: Component::Wifi(true),
-        version: 0,
-    };
-    l.push(wifi);
-    let l1 = l.clone();
-    thread::spawn(move || {
-        let l = l1;
-        let h = l.peek().unwrap();
-        assert_eq!(h, wifi);
-        assert_eq!(l.size(), 1);
-    });
+//     let mut l = List::new();
+//     let wifi = Armor {
+//         component: Component::Wifi(true),
+//         version: 0,
+//     };
+//     l.push(wifi);
+//     let l1 = l.clone();
+//     thread::spawn(move || {
+//         let l = l1;
+//         let h = l.peek().unwrap();
+//         assert_eq!(h, wifi);
+//         assert_eq!(l.size(), 1);
+//     });
 
-    let l1 = l.clone();
-    thread::spawn(move || {
-        let mut l = l1;
-        let comp = l.pop().unwrap();
-        assert_eq!(comp, wifi);
-        assert_eq!(l.size(), 0);
-    });
-}
+//     let l1 = l.clone();
+//     thread::spawn(move || {
+//         let mut l = l1;
+//         let comp = l.pop().unwrap();
+//         assert_eq!(comp, wifi);
+//         assert_eq!(l.size(), 0);
+//     });
+// }
 
-#[test]
-fn public_compatible() {
-    {
-        let mut suit = Suit {
-            armor: List::new(),
-            version: 1,
-        };
+// #[test]
+// fn public_compatible() {
+//     {
+//         let mut suit = Suit {
+//             armor: List::new(),
+//             version: 1,
+//         };
 
-        let wifi = Armor {
-            component: Component::Wifi(true),
-            version: 1,
-        };
-        suit.armor.push(wifi);
+//         let wifi = Armor {
+//             component: Component::Wifi(true),
+//             version: 1,
+//         };
+//         suit.armor.push(wifi);
 
-        let helm = Armor {
-            component: Component::Helmet(true),
-            version: 1,
-        };
-        suit.armor.push(helm);
-        assert!(suit.is_compatible());
-    }
+//         let helm = Armor {
+//             component: Component::Helmet(true),
+//             version: 1,
+//         };
+//         suit.armor.push(helm);
+//         assert!(suit.is_compatible());
+//     }
 
-    {
-        let mut suit = Suit {
-            armor: List::new(),
-            version: 0,
-        };
+//     {
+//         let mut suit = Suit {
+//             armor: List::new(),
+//             version: 0,
+//         };
 
-        let wifi = Armor {
-            component: Component::Wifi(true),
-            version: 1,
-        };
-        suit.armor.push(wifi);
+//         let wifi = Armor {
+//             component: Component::Wifi(true),
+//             version: 1,
+//         };
+//         suit.armor.push(wifi);
 
-        let helm = Armor {
-            component: Component::Helmet(true),
-            version: 1,
-        };
-        suit.armor.push(helm);
-        assert!(!suit.is_compatible());
-    }
-}
+//         let helm = Armor {
+//             component: Component::Helmet(true),
+//             version: 1,
+//         };
+//         suit.armor.push(helm);
+//         assert!(!suit.is_compatible());
+//     }
+// }
 
-#[test]
-fn public_repair() {
-    let mut suit = Suit {
-        armor: List::new(),
-        version: 1,
-    };
+// #[test]
+// fn public_repair() {
+//     let mut suit = Suit {
+//         armor: List::new(),
+//         version: 1,
+//     };
 
-    let repul = Armor {
-        component: Component::LeftRepulsor(true, 80),
-        version: 1,
-    };
-    suit.armor.push(repul);
+//     let repul = Armor {
+//         component: Component::LeftRepulsor(true, 80),
+//         version: 1,
+//     };
+//     suit.armor.push(repul);
 
-    suit.repair();
-    assert_eq!(
-        suit.armor.peek(),
-        Some(Armor {
-            component: Component::LeftRepulsor(false, 100),
-            version: 1,
-        })
-    )
-}
+//     suit.repair();
+//     assert_eq!(
+//         suit.armor.peek(),
+//         Some(Armor {
+//             component: Component::LeftRepulsor(false, 100),
+//             version: 1,
+//         })
+//     )
+// }
 
-//Communicator Functions
-#[test]
-fn public_power() {
-    assert_eq!("Power increased by 60%", Command::Power(true, 60).as_str());
-    assert_eq!("Power decreased by 30%", Command::Power(false, 30).as_str());
+// //Communicator Functions
+// #[test]
+// fn public_power() {
+//     assert_eq!("Power increased by 60%", Command::Power(true, 60).as_str());
+//     assert_eq!("Power decreased by 30%", Command::Power(false, 30).as_str());
 
-    assert_eq!(Command::Power(true, 60), to_command("power inc 60"));
-    assert_eq!(Command::Power(false, 30), to_command("power dec 30"));
-}
+//     assert_eq!(Command::Power(true, 60), to_command("power inc 60"));
+//     assert_eq!(Command::Power(false, 30), to_command("power dec 30"));
+// }
 
-#[test]
-fn public_missiles() {
-    assert_eq!(
-        "Missiles increased by 60",
-        Command::Missiles(true, 60).as_str()
-    );
-    assert_eq!(
-        "Missiles decreased by 30",
-        Command::Missiles(false, 30).as_str()
-    );
+// #[test]
+// fn public_missiles() {
+//     assert_eq!(
+//         "Missiles increased by 60",
+//         Command::Missiles(true, 60).as_str()
+//     );
+//     assert_eq!(
+//         "Missiles decreased by 30",
+//         Command::Missiles(false, 30).as_str()
+//     );
 
-    assert_eq!(Command::Missiles(true, 60), to_command("add 60 missiles"));
-    assert_eq!(Command::Missiles(false, 30), to_command("fire 30 missiles"));
-}
+//     assert_eq!(Command::Missiles(true, 60), to_command("add 60 missiles"));
+//     assert_eq!(Command::Missiles(false, 30), to_command("fire 30 missiles"));
+// }
 
-#[test]
-fn public_shield() {
-    assert_eq!("Shield turned on", Command::Shield(true).as_str());
-    assert_eq!("Shield turned off", Command::Shield(false).as_str());
+// #[test]
+// fn public_shield() {
+//     assert_eq!("Shield turned on", Command::Shield(true).as_str());
+//     assert_eq!("Shield turned off", Command::Shield(false).as_str());
 
-    assert_eq!(Command::Shield(true), to_command("shield on"));
-    assert_eq!(Command::Shield(false), to_command("shield off"));
-}
+//     assert_eq!(Command::Shield(true), to_command("shield on"));
+//     assert_eq!(Command::Shield(false), to_command("shield off"));
+// }
 
-#[test]
-fn public_misc() {
-    assert_eq!("Call attempt failed", Command::Try.as_str());
-    assert_eq!("Not a command", Command::Invalid.as_str());
+// #[test]
+// fn public_misc() {
+//     assert_eq!("Call attempt failed", Command::Try.as_str());
+//     assert_eq!("Not a command", Command::Invalid.as_str());
 
-    assert_eq!(Command::Try, to_command("try calling Miss Potts"));
-    assert_eq!(Command::Invalid, to_command("jarvis!"));
-}
+//     assert_eq!(Command::Try, to_command("try calling Miss Potts"));
+//     assert_eq!(Command::Invalid, to_command("jarvis!"));
+// }

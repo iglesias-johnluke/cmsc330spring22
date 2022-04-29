@@ -3,7 +3,14 @@
     If n is less than 0, return -1
 **/
 pub fn gauss(n: i32) -> i32 {
-    unimplemented!()
+    if n < 0 {
+        return -1
+    }else if n == 1{
+        return 1
+    }
+    return n + gauss(n - 1)
+
+
 }
 
 /**
@@ -11,7 +18,13 @@ pub fn gauss(n: i32) -> i32 {
     are in the range [s,e]
 **/
 pub fn in_range(ls: &[i32], s: i32, e: i32) -> i32 {
-    unimplemented!()
+    let mut total = 0;
+    for item in ls.iter(){
+        if item >= &s && item <= &e{
+            total = total + 1
+        }
+    }
+    return total;
 }
 
 /**
@@ -20,7 +33,12 @@ pub fn in_range(ls: &[i32], s: i32, e: i32) -> i32 {
     Ex: [1,3,2] is a subset of [1,2,3,4,5]
 **/
 pub fn subset<T: PartialEq>(set: &[T], target: &[T]) -> bool {
-    unimplemented!()
+    for item in target.iter(){
+        if set.contains(item) == false{
+            return false
+        }
+    }
+    return true
 }
 
 /**
@@ -28,7 +46,12 @@ pub fn subset<T: PartialEq>(set: &[T], target: &[T]) -> bool {
     It might be helpful to use the fold method of the Iterator trait
 **/
 pub fn mean(ls: &[f64]) -> Option<f64> {
-    unimplemented!()
+    if ls == []{
+        return None
+    }
+    let sum : f64 = ls.iter().sum();
+    let length = ls.len() as f64;
+    return Some(sum/length) 
 }
 
 /**
@@ -37,7 +60,16 @@ pub fn mean(ls: &[f64]) -> Option<f64> {
     Ex: to_decimal of [1,0,1,0] returns 10
 **/
 pub fn to_decimal(ls: &[i32]) -> i32 {
-    unimplemented!()
+    if ls == []{
+        return 0
+    }
+    let mut str = "".to_owned();
+
+    for item in ls.iter(){
+        str.push_str(&item.to_string());
+    }
+    let intval = isize::from_str_radix(&str, 2).unwrap();
+    return intval as i32
 }
 
 /**
