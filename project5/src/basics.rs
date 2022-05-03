@@ -79,7 +79,18 @@ pub fn to_decimal(ls: &[i32]) -> i32 {
     Ex: factorize of 36 should return [2,2,3,3] since 36 = 2 * 2 * 3 * 3
 **/
 pub fn factorize(n: u32) -> Vec<u32> {
-    unimplemented!()
+    let mut output : Vec<u32> = Vec::new();
+    let mut i = 2;
+    let mut n = n;
+    while n > 1 {
+        if n % i == 0{
+            output.push(i);
+            n = n/i;
+            i = i - 1;
+        }
+        i = i + 1;
+    }
+    return output
 }
 
 /** 
@@ -90,7 +101,14 @@ pub fn factorize(n: u32) -> Vec<u32> {
     EX: rotate [1,2,3,4] returns [2,3,4,1]
 **/
 pub fn rotate(lst: &[i32]) -> Vec<i32> {
-    unimplemented!()
+    let mut output : Vec<i32> = Vec::new();
+    let first = lst[0];
+    
+    for i in 1..(lst.len()){
+        output.push(lst[i]);
+    }
+    output.push(first);
+    return output
 }
 
 /**

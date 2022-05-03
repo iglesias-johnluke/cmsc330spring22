@@ -80,32 +80,32 @@ fn public_factorize() {
     assert_eq!(vec, factorize(330));
 }
 
-// #[test]
-// fn public_rotate() {
-//     let mut vec = Vec::new();
-//     vec.push(3);
-//     vec.push(3);
-//     vec.push(0);
+#[test]
+fn public_rotate() {
+    let mut vec = Vec::new();
+    vec.push(3);
+    vec.push(3);
+    vec.push(0);
 
-//     let xs = [0, 3, 3];
-//     assert_eq!(vec, rotate(&xs));
+    let xs = [0, 3, 3];
+    assert_eq!(vec, rotate(&xs));
 
-//     vec.remove(0);
-//     vec.remove(0);
-//     vec.remove(0);
+    vec.remove(0);
+    vec.remove(0);
+    vec.remove(0);
 
-//     let xs = [1];
-//     vec.push(1);
-//     assert_eq!(vec, rotate(&xs));
-//     vec.remove(0);
+    let xs = [1];
+    vec.push(1);
+    assert_eq!(vec, rotate(&xs));
+    vec.remove(0);
 
-//     let xs = [1, 1, 2, 1];
-//     vec.push(1);
-//     vec.push(2);
-//     vec.push(1);
-//     vec.push(1);
-//     assert_eq!(vec, rotate(&xs));
-// }
+    let xs = [1, 1, 2, 1];
+    vec.push(1);
+    vec.push(2);
+    vec.push(1);
+    vec.push(1);
+    assert_eq!(vec, rotate(&xs));
+}
 
 // #[test]
 // fn public_substr() {
