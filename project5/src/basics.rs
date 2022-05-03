@@ -118,7 +118,21 @@ pub fn rotate(lst: &[i32]) -> Vec<i32> {
     Ex: "ace" is a substring of "rustacean"
 **/
 pub fn substr(s: &String, target: &str) -> bool {
-    unimplemented!()
+    if target == ""{
+        return true
+    }if target.len() > s.len(){
+        return false
+    }
+    let mut output = false;
+    for (i, item) in s.char_indices() {
+        if item.to_string() == &target[0..1] && (i + target.len()) <= s.len(){
+            let curr_string = &s[ i..(i + target.len()) ];
+            if curr_string == target{
+                output = true;
+            }
+        }
+    }
+    return output;
 }
 
 /**
@@ -131,4 +145,14 @@ pub fn substr(s: &String, target: &str) -> bool {
 **/
 pub fn longest_sequence(s: &str) -> Option<&str> {
     unimplemented!()
+    // https://www.geeksforgeeks.org/largest-substring-with-same-characters/
+    // if s == ""{
+    //     return None
+    // }
+    // let mut longestChar = &s[0..1];
+    // let mut longestLength = 1;
+    // // let mut curr_index = 1;
+   
+   
+    // return Some(&longestChar.repeat(longestLength));
 }

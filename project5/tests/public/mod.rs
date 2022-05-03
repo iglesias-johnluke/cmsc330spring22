@@ -107,27 +107,27 @@ fn public_rotate() {
     assert_eq!(vec, rotate(&xs));
 }
 
-// #[test]
-// fn public_substr() {
-//     assert_eq!(
-//         true,
-//         substr(
-//             &"CMSC 330 is the best CS class".to_string(),
-//             &"CMSC 330".to_string()
-//         )
-//     );
-//     assert_eq!(
-//         false,
-//         substr(
-//             &"CMSC 330 is the best CS class".to_string(),
-//             &"CMSC 351 is the best CS class".to_string()
-//         )
-//     );
-//     assert_eq!(
-//         true,
-//         substr(&"I love CMSC330".to_string(), &"I love CMSC330".to_string())
-//     );
-// }
+#[test]
+fn public_substr() {
+    assert_eq!(
+        true,
+        substr(
+            &"CMSC 330 is the best CS class".to_string(),
+            &"CMSC 330".to_string()
+        )
+    );
+    assert_eq!(
+        false,
+        substr(
+            &"CMSC 330 is the best CS class".to_string(),
+            &"CMSC 351 is the best CS class".to_string()
+        )
+    );
+    assert_eq!(
+        true,
+        substr(&"I love CMSC330".to_string(), &"I love CMSC330".to_string())
+    );
+}
 
 // #[test]
 // fn public_longseq() {
