@@ -102,8 +102,10 @@ pub fn factorize(n: u32) -> Vec<u32> {
 **/
 pub fn rotate(lst: &[i32]) -> Vec<i32> {
     let mut output : Vec<i32> = Vec::new();
+    if lst == []{
+        return output;
+    }
     let first = lst[0];
-    
     for i in 1..(lst.len()){
         output.push(lst[i]);
     }
@@ -144,15 +146,37 @@ pub fn substr(s: &String, target: &str) -> bool {
     EX: longest_sequence of "" is None
 **/
 pub fn longest_sequence(s: &str) -> Option<&str> {
-    unimplemented!()
-    // https://www.geeksforgeeks.org/largest-substring-with-same-characters/
-    // if s == ""{
-    //     return None
-    // }
-    // let mut longestChar = &s[0..1];
-    // let mut longestLength = 1;
-    // // let mut curr_index = 1;
-   
-   
-    // return Some(&longestChar.repeat(longestLength));
+    if s == ""{
+        return None
+    }
+    let mut longestStr = String::new();
+    longestStr.push(s.chars().nth(0).unwrap());
+    
+    let mut longestStart = 0;
+    let mut tmpStart = 0;
+    
+    let mut tmpStr = String::new();
+    tmpStr.push(s.chars().nth(0).unwrap());
+    
+    for i in 1..s.len(){
+        let currChar = &s[i..i+1];
+        let prevChar = &s[i-1..i];
+        if currChar == prevChar{
+            tmpStr.push(s.chars().nth(i).unwrap());
+        }else{
+            if tmpStr.len() > longestStr.len(){
+                longestStr = tmpStr.clone();
+                longestStart = tmpStart;
+            }
+            tmpStr = s[i..i+1].to_string();
+            tmpStart = i;
+        }
+    }
+    if tmpStr.len() > longestStr.len(){
+        longestStr = tmpStr.clone();
+        longestStart = tmpStart;
+    }
+    
+    return Some(&s[longestStart..(longestStart + longestStr.len())]);
+
 }

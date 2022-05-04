@@ -129,12 +129,12 @@ fn public_substr() {
     );
 }
 
-// #[test]
-// fn public_longseq() {
-//     assert_eq!(Some("aa"), longest_sequence(&"aabbaa".to_string()));
-//     assert_eq!(Some("bb"), longest_sequence(&"a abba a".to_string()));
-//     assert_eq!(Some("bbbbbb"), longest_sequence(&"babaabbbaaaabbbbbbaaaa"));
-// }
+#[test]
+fn public_longseq() {
+    assert_eq!(Some("aa"), longest_sequence(&"aabbaa".to_string()));
+    assert_eq!(Some("bb"), longest_sequence(&"a abba a".to_string()));
+    assert_eq!(Some("bbbbbb"), longest_sequence(&"babaabbbaaaabbbbbbaaaa"));
+}
 
 // // Linked List
 // #[test]
